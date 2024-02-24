@@ -45,8 +45,17 @@ namespace OK {
             current = {};
         }
         else {
-          // a string, a word, or a number
-            state = return_state; // temporary measure until we actually start saving values
+            switch (token.type) {
+            case JSON_TOKEN_TYPE::STRING:
+                current.children.push_back({token.string});
+                break;
+            case JSON_TOKEN_TYPE::NUMBER:
+                current.children.push_back({token.number});
+                break;
+            default:
+                current.children.push_back({static_cast<JSON_TYPE>(token.type)});
+            }
+            state = return_state;
         }
     }
 

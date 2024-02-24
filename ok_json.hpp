@@ -28,6 +28,11 @@ namespace OK {
 
         json(JSON_TYPE type) {
             this->type = type;
+            if (type == JSON_TYPE::OBJECT) {
+              this->map = {};
+            } else if (type == JSON_TYPE::ARRAY) {
+              this->children = {};
+            }
         }
 
         json(std::string_view string) {
