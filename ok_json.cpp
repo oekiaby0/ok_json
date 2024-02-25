@@ -82,7 +82,7 @@ namespace OK {
         std::stack<State> state_stack = {};
         std::stack<json> json_stack = {};
         std::stack<std::string_view> key_stack = {};
-        json current{};
+        json current;
         for (size_t i = 0; i < tokens.size(); i++) {
             auto &token = tokens.at(i);
             switch (state) {

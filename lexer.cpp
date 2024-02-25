@@ -154,13 +154,16 @@ namespace OK {
 //			return { 0, 0 };
 //		}
 //		return { value, i };
-
-        size_t pos;
-        long double value = std::stold(str.data(), &pos);
-        if (pos == 0 || pos == i+1) {
-            return {0, 0};
+        try {
+            size_t pos;
+            long double value = std::stold(str.data(), &pos);
+            if (pos == 0 || pos == i+1) {
+                return {0, 0};
+            }
+            return {value, pos};
+        } catch (...) {
+            return {0,0};
         }
-        return {value, pos};
     }
 
     std::optional<std::vector<OK::json_token>> tokenize(std::string_view str) {
