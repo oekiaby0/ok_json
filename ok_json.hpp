@@ -16,12 +16,10 @@ namespace OK {
 
     struct json {
         JSON_TYPE type;
-        union {
-            std::map<std::string_view, json> map;
-            std::vector<json> children;
-            std::string_view string;
-            long double number;
-        };
+        std::unordered_map<std::string_view, json> map;
+        std::vector<json> children;
+        std::string_view string;
+        long double number;
 
         ~json() {}
         json() {}
@@ -35,7 +33,7 @@ namespace OK {
             }
         }
 
-        json(std::string_view string) {
+        json(std::string_view& string) {
             this->type = JSON_TYPE::STRING;
             this->string = string;
         }
@@ -45,29 +43,24 @@ namespace OK {
             this->number = number;
         }
 
-        json(const json &other) : type(other.type) {
-          switch (this->type) {
+        json(const json& other) {
+          type = other.type;
+          switch (type) {
           case JSON_TYPE::OBJECT:
-            new(&this->map) std::map<std::string_view, json>(other.map);
+            map = other.map;
             break;
           case JSON_TYPE::ARRAY:
-            new(&this->children) std::vector<json>(other.children);
+            children = other.children;
             break;
           case JSON_TYPE::STRING:
-            this->string = other.string;
+            string = other.string;
             break;
           case JSON_TYPE::NUMBER:
-            this->number = other.number;
+            number = other.number;
             break;
           default:
             break;
           }
-        }
-        
-        
-        void operator=(const json &other) {
-            this->type = other.type;
-            this->number = other.number;
         }
     };
 

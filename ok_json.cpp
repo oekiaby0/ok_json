@@ -3,7 +3,7 @@
 #include "ok_json.hpp"
 #include "lexer.hpp"
 
-#define FAIL() return std::nullopt;
+#define FAIL() return std::nullopt
 
 namespace OK {
     inline bool is_value(json_token token) {
@@ -30,6 +30,19 @@ namespace OK {
         ARRAY_COMMA
     };
 
+    void handle_json_return(json& current, std::stack<json>& json_stack, std::stack<std::string_view>& key_stack) {
+        auto top = json_stack.top();
+        json_stack.pop();
+        if (top.type == JSON_TYPE::ARRAY) {
+            top.children.push_back(current);
+        } else if (top.type == JSON_TYPE::OBJECT) {
+            auto key = key_stack.top();
+            key_stack.pop();
+            top.map[key] = current;
+        }
+        current = top;
+    }
+
     void handle_value(json_token token, State return_state, State& state, std::stack<State>& state_stack,
                       json& current, std::stack<json>& json_stack) {
         if (token.type == JSON_TOKEN_TYPE::LEFT_BRACE) {
@@ -37,12 +50,14 @@ namespace OK {
             state = OBJECT_START;
             json_stack.push(current);
             current = {};
+            current.type = JSON_TYPE::OBJECT;
         }
         else if (token.type == JSON_TOKEN_TYPE::LEFT_BRACKET) {
             state_stack.push(return_state);
             state = ARRAY_START;
             json_stack.push(current);
             current = {};
+            current.type = JSON_TYPE::ARRAY;
         }
         else {
             switch (token.type) {
@@ -69,8 +84,8 @@ namespace OK {
         State state = DEFAULT;
         std::stack<State> state_stack = {};
         std::stack<json> json_stack = {};
+        std::stack<std::string_view> key_stack = {};
         json current{};
-        std::string_view key;
         for (size_t i = 0; i < tokens.size(); i++) {
             auto &token = tokens.at(i);
             switch (state) {
@@ -120,7 +135,7 @@ namespace OK {
                 }
                 else if (token.type == JSON_TOKEN_TYPE::STRING) {
                     state = OBJECT_KEY;
-                    key = token.string;
+                    key_stack.push(token.string);
                 }
                 else {
                     FAIL();
@@ -136,8 +151,7 @@ namespace OK {
                 else {
                     state = state_stack.top();
                     state_stack.pop();
-                    current = json_stack.top();
-                    json_stack.pop();
+                    handle_json_return(current, json_stack, key_stack);
                 }
                 break;
             case OBJECT_KEY:
@@ -154,15 +168,19 @@ namespace OK {
                     state = OBJECT_START;
                     json_stack.push(current);
                     current = {};
+                    current.type = JSON_TYPE::OBJECT;
                 }
                 else if (token.type == JSON_TOKEN_TYPE::LEFT_BRACKET) {
                     state_stack.push(OBJECT_VALUE);
                     state = ARRAY_START;
                     json_stack.push(current);
                     current = {};
+                    current.type = JSON_TYPE::ARRAY;
                 }
                 else {
                     state = OBJECT_VALUE;
+                    auto key = key_stack.top();
+                    key_stack.pop();
                     if (token.type == JSON_TOKEN_TYPE::STRING) {
                         current.map[key] = { token.string };
                     }
@@ -194,6 +212,7 @@ namespace OK {
             case OBJECT_COMMA:
                 if (token.type == JSON_TOKEN_TYPE::STRING) {
                     state = OBJECT_KEY;
+                    key_stack.push(token.string);
                 }
                 else {
                     FAIL();
@@ -220,8 +239,7 @@ namespace OK {
                 else {
                     state = state_stack.top();
                     state_stack.pop();
-                    current = json_stack.top();
-                    json_stack.pop();
+                    handle_json_return(current, json_stack, key_stack);
                 }
                 break;
             case ARRAY_VALUE:
@@ -248,6 +266,6 @@ namespace OK {
         if ((state != ARRAY_END && state != OBJECT_END) || !state_stack.empty()) {
             FAIL();
         }
-        return { JSON_TYPE::TRUE_WORD };
+        return current;
     }
 }

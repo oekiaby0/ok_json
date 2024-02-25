@@ -1,10 +1,6 @@
 #include <string>
-#include <stdbool.h>
-#include <charconv>
-#include <cassert>
 
 #include "lexer.hpp"
-#include <iostream>
 
 #define HANDLE_WORD(wordstr, value) {\
 	if (c == wordstr[++word_index]) {\
@@ -170,12 +166,19 @@ namespace OK {
 		}
 
 		// TODO: parse the number while verifying its grammar for speed?
-		long double value;
-		auto result = std::from_chars(str.data(), str.data() + i, value);
-		if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range) {
-			return { 0, 0 };
-		}
-		return { value, i };
+//		long double value;
+//		auto result = std::from_chars(str.data(), str.data() + i, value);
+//		if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range) {
+//			return { 0, 0 };
+//		}
+//		return { value, i };
+
+        size_t pos;
+        long double value = std::stold(str.data(), &pos);
+        if (pos == 0 || pos == i) {
+            return { 0, 0 };
+        }
+        return { value, pos };
 	}
 
 	std::optional<std::vector<OK::json_token>> tokenize(std::string_view str) {
