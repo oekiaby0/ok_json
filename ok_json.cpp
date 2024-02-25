@@ -74,7 +74,7 @@ namespace OK {
     std::optional<json> parse(std::string_view string) {
         auto tokens_optional = tokenize(string);
         if (!tokens_optional.has_value()) {
-            return std::nullopt;
+            FAIL();
         }
 
         auto tokens = tokens_optional.value();

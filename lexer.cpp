@@ -2,6 +2,8 @@
 
 #include "lexer.hpp"
 
+#define FAIL() return std::nullopt
+
 #define HANDLE_WORD(wordstr, value) {\
     if (c == wordstr[++word_index]) {\
         if (word_index == std::char_traits<char>::length(wordstr) - 1) {\
@@ -11,7 +13,7 @@
         }\
     }\
     else {\
-        return std::nullopt;\
+        FAIL();\
     }\
 }
 
@@ -155,7 +157,7 @@ namespace OK {
 
         size_t pos;
         long double value = std::stold(str.data(), &pos);
-        if (pos == 0 || pos == i) {
+        if (pos == 0 || pos == i+1) {
             return {0, 0};
         }
         return {value, pos};
@@ -228,7 +230,7 @@ namespace OK {
                         state = WORD_NULL;
                         continue;
                     default:
-                        return std::nullopt;
+                        FAIL();
                 }
             } else if (state == STRING) {
                 if (c == '"' && !is_escaped) {
@@ -251,7 +253,7 @@ namespace OK {
             if (state == NUMBER) {
                 Number number = parse_number(str.substr(index));
                 if (!number.length) {
-                    return std::nullopt;
+                    FAIL();
                 }
                 tokens.push_back({number.value});
                 index += number.length - 1;
@@ -260,7 +262,7 @@ namespace OK {
         }
 
         if (state != DEFAULT) {
-            return std::nullopt;
+            FAIL();
         }
         return tokens;
     }
