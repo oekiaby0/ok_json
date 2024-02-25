@@ -90,11 +90,11 @@ namespace OK {
                     switch (token.type) {
                         case JSON_TOKEN_TYPE::LEFT_BRACE:
                             state = OBJECT_START;
-                            current.type = JSON_TYPE::OBJECT;
+                            current = {JSON_TYPE::OBJECT};
                             break;
                         case JSON_TOKEN_TYPE::LEFT_BRACKET:
                             state = ARRAY_START;
-                            current.type = JSON_TYPE::ARRAY;
+                            current = {JSON_TYPE::ARRAY};
                             break;
                         case JSON_TOKEN_TYPE::NUMBER:
                             if (tokens.size() != 1) {
