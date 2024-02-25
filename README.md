@@ -1,11 +1,11 @@
-## ok_json: A Simple JSON Parser in C++
+# ok_json: A Simple JSON Parser in C++
 
-**Features**
+## Features
 
 * No external dependencies.
 * Easy-to-use API.
 
-**Usage**
+## Usage
 
 **Parsing a JSON string:**
 
@@ -52,7 +52,11 @@ example_json.map = {
 std::string json_str = example_json.to_string(); // Serialize to JSON string
 ```
 
-**More information**
+## Known Limitations
+- It does not verify and convert Unicode control characters (e.g., \u1234).
+- It may not cover all edge cases or conform to the JSON spec in every detail.
+
+## More information
 - See ok_json.hpp for documentation on functions and structures.
 - GPL3 License.
 - Contributions welcome!
