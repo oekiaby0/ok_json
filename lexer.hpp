@@ -7,17 +7,17 @@
 
 namespace OK {
     enum class JSON_TOKEN_TYPE {
-        TRUE = 1,
-        FALSE,
-        NULL_WORD,
+        COMMA,
+        COLON,
         STRING,
         NUMBER,
+        TRUE,
+        FALSE,
+        NULL_WORD,
         LEFT_BRACE,
         RIGHT_BRACE,
         LEFT_BRACKET,
-        RIGHT_BRACKET,
-        COMMA,
-        COLON
+        RIGHT_BRACKET
     };
 
     struct json_token {

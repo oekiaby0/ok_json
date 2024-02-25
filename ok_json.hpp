@@ -6,21 +6,25 @@
 
 namespace OK {
     enum class JSON_TYPE {
-        TRUE_WORD = 1,
-        FALSE_WORD,
-        NULL_WORD,
-        STRING,
-        NUMBER,
         OBJECT,
         ARRAY,
+        STRING,
+        NUMBER,
+        TRUE_WORD,
+        FALSE_WORD,
+        NULL_WORD,
     };
+
+    struct json;
+    typedef std::unordered_map<std::string_view, json> json_object;
+    typedef std::vector<json> json_array;
+    typedef long double json_number;
+    typedef std::string_view json_string;
+    typedef std::variant<json_object, json_array, json_string, json_number> json_value;
 
     struct json {
         JSON_TYPE type;
-        std::unordered_map<std::string_view, json> map;
-        std::vector<json> children;
-        std::string_view string;
-        long double number;
+        json_value value;
 
         ~json() {}
 
@@ -29,40 +33,25 @@ namespace OK {
         json(JSON_TYPE type) {
             this->type = type;
             if (type == JSON_TYPE::OBJECT) {
-                this->map = {};
+                this->value = std::unordered_map<std::string_view, json>{};
             } else if (type == JSON_TYPE::ARRAY) {
-                this->children = {};
+                this->value = std::vector<json>{};
             }
         }
 
         json(std::string_view &string) {
             this->type = JSON_TYPE::STRING;
-            this->string = string;
+            this->value = string;
         }
 
         json(long double number) {
             this->type = JSON_TYPE::NUMBER;
-            this->number = number;
+            this->value = number;
         }
 
         json(const json &other) {
             type = other.type;
-            switch (type) {
-                case JSON_TYPE::OBJECT:
-                    map = other.map;
-                    break;
-                case JSON_TYPE::ARRAY:
-                    children = other.children;
-                    break;
-                case JSON_TYPE::STRING:
-                    string = other.string;
-                    break;
-                case JSON_TYPE::NUMBER:
-                    number = other.number;
-                    break;
-                default:
-                    break;
-            }
+            value = other.value;
         }
 
         std::string to_string() const;

@@ -35,11 +35,11 @@ namespace OK {
         auto top = json_stack.top();
         json_stack.pop();
         if (top.type == JSON_TYPE::ARRAY) {
-            top.children.push_back(current);
+            std::get<json_array>(top.value).push_back(current);
         } else if (top.type == JSON_TYPE::OBJECT) {
             auto key = key_stack.top();
             key_stack.pop();
-            top.map[key] = current;
+            std::get<json_object>(top.value)[key] = current;
         }
         current = top;
     }
@@ -50,24 +50,22 @@ namespace OK {
             state_stack.push(return_state);
             state = OBJECT_START;
             json_stack.push(current);
-            current = {};
-            current.type = JSON_TYPE::OBJECT;
+            current = {JSON_TYPE::OBJECT};
         } else if (token.type == JSON_TOKEN_TYPE::LEFT_BRACKET) {
             state_stack.push(return_state);
             state = ARRAY_START;
             json_stack.push(current);
-            current = {};
-            current.type = JSON_TYPE::ARRAY;
+            current = {JSON_TYPE::ARRAY};
         } else {
             switch (token.type) {
                 case JSON_TOKEN_TYPE::STRING:
-                    current.children.push_back({token.string});
+                    std::get<json_array>(current.value).push_back({token.string});
                     break;
                 case JSON_TOKEN_TYPE::NUMBER:
-                    current.children.push_back({token.number});
+                    std::get<json_array>(current.value).push_back({token.number});
                     break;
                 default:
-                    current.children.push_back({static_cast<JSON_TYPE>(token.type)});
+                    std::get<json_array>(current.value).push_back({static_cast<JSON_TYPE>(token.type)});
             }
             state = return_state;
         }
@@ -159,27 +157,25 @@ namespace OK {
                         state_stack.push(OBJECT_VALUE);
                         state = OBJECT_START;
                         json_stack.push(current);
-                        current = {};
-                        current.type = JSON_TYPE::OBJECT;
+                        current = {JSON_TYPE::OBJECT};
                     } else if (token.type == JSON_TOKEN_TYPE::LEFT_BRACKET) {
                         state_stack.push(OBJECT_VALUE);
                         state = ARRAY_START;
                         json_stack.push(current);
-                        current = {};
-                        current.type = JSON_TYPE::ARRAY;
+                        current = {JSON_TYPE::ARRAY};
                     } else {
                         state = OBJECT_VALUE;
                         auto key = key_stack.top();
                         key_stack.pop();
                         if (token.type == JSON_TOKEN_TYPE::STRING) {
-                            current.map[key] = {token.string};
+                            std::get<json_object>(current.value)[key] = {token.string};
                         } else if (token.type == JSON_TOKEN_TYPE::NUMBER) {
-                            current.map[key] = {token.number};
+                            std::get<json_object>(current.value)[key] = {token.number};
                         } else if (token.type == JSON_TOKEN_TYPE::TRUE
                                    || token.type == JSON_TOKEN_TYPE::FALSE
                                    || token.type == JSON_TOKEN_TYPE::NULL_WORD
                                 ) {
-                            current.map[key] = {static_cast<JSON_TYPE>(token.type)};
+                            std::get<json_object>(current.value)[key] = {static_cast<JSON_TYPE>(token.type)};
                         } else {
                             FAIL();
                         }
@@ -259,10 +255,10 @@ namespace OK {
         switch (node.type) {
             case JSON_TYPE::OBJECT: {
                 result << "{";
-                for (auto it = node.map.begin(); it != node.map.end(); ++it) {
+                for (auto it = std::get<json_object>(node.value).begin(); it != std::get<json_object>(node.value).end(); ++it) {
                     result << "\"" << it->first << "\":";
                     to_string_helper(result, it->second);
-                    if (std::next(it) != node.map.end()) {
+                    if (std::next(it) != std::get<json_object>(node.value).end()) {
                         result << ",";
                     }
                 }
@@ -272,9 +268,9 @@ namespace OK {
 
             case JSON_TYPE::ARRAY: {
                 result << "[";
-                for (auto it = node.children.begin(); it != node.children.end(); ++it) {
+                for (auto it = std::get<json_array>(node.value).begin(); it != std::get<json_array>(node.value).end(); ++it) {
                     to_string_helper(result, *it);
-                    if (std::next(it) != node.children.end()) {
+                    if (std::next(it) != std::get<json_array>(node.value).end()) {
                         result << ",";
                     }
                 }
@@ -283,12 +279,12 @@ namespace OK {
             }
 
             case JSON_TYPE::STRING: {
-                result << "\"" << node.string << "\"";
+                result << "\"" << std::get<json_string>(node.value) << "\"";
                 break;
             }
 
             case JSON_TYPE::NUMBER: {
-                result << node.number;
+                result << std::get<json_number>(node.value);
                 break;
             }
 
