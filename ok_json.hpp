@@ -58,4 +58,5 @@ namespace OK {
     };
 
     std::optional<json> parse(std::string_view string);
+    std::optional<json> parse(std::istream& stream);
 }

@@ -243,6 +243,13 @@ namespace OK {
         return current;
     }
 
+    std::optional<json> parse(std::istream& stream) {
+        std::stringstream buffer;
+        buffer << stream.rdbuf();
+        std::string content = buffer.str();
+        return parse(content);
+    }
+
     void to_string_helper(std::ostringstream &result, const json &node);
 
     std::string json::to_string() const {
