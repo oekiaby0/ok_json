@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 #include <string_view>
 #include <optional>
 #include <map>
@@ -22,18 +23,19 @@ namespace OK {
         long double number;
 
         ~json() {}
+
         json() {}
 
         json(JSON_TYPE type) {
             this->type = type;
             if (type == JSON_TYPE::OBJECT) {
-              this->map = {};
+                this->map = {};
             } else if (type == JSON_TYPE::ARRAY) {
-              this->children = {};
+                this->children = {};
             }
         }
 
-        json(std::string_view& string) {
+        json(std::string_view &string) {
             this->type = JSON_TYPE::STRING;
             this->string = string;
         }
@@ -43,25 +45,27 @@ namespace OK {
             this->number = number;
         }
 
-        json(const json& other) {
-          type = other.type;
-          switch (type) {
-          case JSON_TYPE::OBJECT:
-            map = other.map;
-            break;
-          case JSON_TYPE::ARRAY:
-            children = other.children;
-            break;
-          case JSON_TYPE::STRING:
-            string = other.string;
-            break;
-          case JSON_TYPE::NUMBER:
-            number = other.number;
-            break;
-          default:
-            break;
-          }
+        json(const json &other) {
+            type = other.type;
+            switch (type) {
+                case JSON_TYPE::OBJECT:
+                    map = other.map;
+                    break;
+                case JSON_TYPE::ARRAY:
+                    children = other.children;
+                    break;
+                case JSON_TYPE::STRING:
+                    string = other.string;
+                    break;
+                case JSON_TYPE::NUMBER:
+                    number = other.number;
+                    break;
+                default:
+                    break;
+            }
         }
+
+        std::string to_string() const;
     };
 
     std::optional<json> parse(std::string_view string);
