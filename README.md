@@ -51,7 +51,7 @@ std::string json_str = example_json.serialize(); // Serialize to JSON string
 ```
 
 ## Known Limitations
-- It does not verify and unescape Unicode control characters (e.g., \u1234).
+- It does not verify, escape and unescape both unicode and control characters (e.g., \u1234, \t).
 - It may not cover all edge cases or conform to the JSON spec in every detail.
 
 ## More information
