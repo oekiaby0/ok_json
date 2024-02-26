@@ -29,26 +29,25 @@ int main() {
 
 ```c++
 if (json.type == OK::JSON_TYPE::STRING) {
-    std::string name = get<json_string>(json.value); // Get name string
+    std::string name = json.string();
 } else if (json.type == OK::JSON_TYPE::NUMBER) {
-    int age = get<json_number>(json.value);; // Get age number
+    int age = json.number();
 } else if (json.type == OK::JSON_TYPE::OBJECT) {
-    // Access object properties using get<json_object>(json.value)
+   OK::json obj2 = json["obj2"];
 } else if (json.type == OK::JSON_TYPE::ARRAY) {
-    // Access array elements using get<json_array>(json.value)
+   int value = json[2].number();
 }
 ```
 
 **Constructing JSON data:**
 ```c++
-OK::json example_json {OK::JSON_TYPE::OBJECT};
-example_json.value = {
-    {"name", OK::json("John")},
-    {"age", OK::json(25)},
-    {"is_student", OK::json(true)}
-};
+OK::json example_json {{
+    {"name", {"John"}},
+    {"age", {25}},
+    {"is_student", OK::json{OK::JSON_TYPE::TRUE}}
+}};
 
-std::string json_str = example_json.to_string(); // Serialize to JSON string
+std::string json_str = example_json.serialize(); // Serialize to JSON string
 ```
 
 ## Known Limitations
