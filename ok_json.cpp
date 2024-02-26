@@ -295,6 +295,21 @@ namespace OK {
                 break;
             }
 
+            case JSON_TYPE::TRUE: {
+                result << "true";
+                break;
+            }
+
+            case JSON_TYPE::FALSE: {
+                result << "false";
+                break;
+            }
+
+            case JSON_TYPE::NULL_WORD: {
+                result << "null";
+                break;
+            }
+
             default:
                 break;
         }

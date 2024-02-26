@@ -10,8 +10,8 @@ namespace OK {
         ARRAY,
         STRING,
         NUMBER,
-        TRUE_WORD,
-        FALSE_WORD,
+        TRUE,
+        FALSE,
         NULL_WORD,
     };
 
