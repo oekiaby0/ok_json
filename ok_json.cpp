@@ -50,12 +50,12 @@ namespace OK {
             state_stack.push(return_state);
             state = OBJECT_START;
             json_stack.push(current);
-            current = {JSON_TYPE::OBJECT};
+            current = json{JSON_TYPE::OBJECT};
         } else if (token.type == JSON_TOKEN_TYPE::LEFT_BRACKET) {
             state_stack.push(return_state);
             state = ARRAY_START;
             json_stack.push(current);
-            current = {JSON_TYPE::ARRAY};
+            current = json{JSON_TYPE::ARRAY};
         } else {
             switch (token.type) {
                 case JSON_TOKEN_TYPE::STRING:
@@ -65,7 +65,7 @@ namespace OK {
                     std::get<json_array>(current.value).push_back({token.number});
                     break;
                 default:
-                    std::get<json_array>(current.value).push_back({static_cast<JSON_TYPE>(token.type)});
+                    std::get<json_array>(current.value).push_back(json{static_cast<JSON_TYPE>(token.type)});
             }
             state = return_state;
         }
@@ -90,11 +90,11 @@ namespace OK {
                     switch (token.type) {
                         case JSON_TOKEN_TYPE::LEFT_BRACE:
                             state = OBJECT_START;
-                            current = {JSON_TYPE::OBJECT};
+                            current = json{JSON_TYPE::OBJECT};
                             break;
                         case JSON_TOKEN_TYPE::LEFT_BRACKET:
                             state = ARRAY_START;
-                            current = {JSON_TYPE::ARRAY};
+                            current = json{JSON_TYPE::ARRAY};
                             break;
                         case JSON_TOKEN_TYPE::NUMBER:
                             if (tokens.size() != 1) {
@@ -116,7 +116,7 @@ namespace OK {
                             if (tokens.size() != 1) {
                                 FAIL();
                             } else {
-                                return {static_cast<JSON_TYPE>(token.type)};
+                                return json{static_cast<JSON_TYPE>(token.type)};
                             }
                             break;
                         default:
@@ -157,12 +157,12 @@ namespace OK {
                         state_stack.push(OBJECT_VALUE);
                         state = OBJECT_START;
                         json_stack.push(current);
-                        current = {JSON_TYPE::OBJECT};
+                        current = json{JSON_TYPE::OBJECT};
                     } else if (token.type == JSON_TOKEN_TYPE::LEFT_BRACKET) {
                         state_stack.push(OBJECT_VALUE);
                         state = ARRAY_START;
                         json_stack.push(current);
-                        current = {JSON_TYPE::ARRAY};
+                        current = json{JSON_TYPE::ARRAY};
                     } else {
                         state = OBJECT_VALUE;
                         auto key = key_stack.top();
@@ -175,7 +175,7 @@ namespace OK {
                                    || token.type == JSON_TOKEN_TYPE::FALSE
                                    || token.type == JSON_TOKEN_TYPE::NULL_WORD
                                 ) {
-                            std::get<json_object>(current.value)[key] = {static_cast<JSON_TYPE>(token.type)};
+                            std::get<json_object>(current.value)[key] = json{static_cast<JSON_TYPE>(token.type)};
                         } else {
                             FAIL();
                         }
@@ -252,7 +252,7 @@ namespace OK {
 
     void to_string_helper(std::ostringstream &result, const json &node);
 
-    std::string json::to_string() const {
+    std::string json::serialize() const {
         std::ostringstream result;
         to_string_helper(result, *this);
         return result.str();
