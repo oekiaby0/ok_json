@@ -33,9 +33,9 @@ if (json.type == OK::JSON_TYPE::STRING) {
 } else if (json.type == OK::JSON_TYPE::NUMBER) {
     int age = json.number();
 } else if (json.type == OK::JSON_TYPE::OBJECT) {
-   OK::json obj2 = json["obj2"];
+    OK::json obj2 = json["obj2"];
 } else if (json.type == OK::JSON_TYPE::ARRAY) {
-   int value = json[2].number();
+    int value = json[2].number();
 }
 ```
 
